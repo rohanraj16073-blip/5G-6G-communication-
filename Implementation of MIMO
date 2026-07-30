@@ -1,0 +1,68 @@
+clc; clear; close all;
+
+% SNR Parameters
+SNR_dB = 0:2:20;
+SNR = 10.^(SNR_dB/10);
+BER = zeros(size(SNR));
+Reliability = zeros(size(SNR));
+
+% MIMO Parameters
+Nt = 2; Nr = 2;
+
+% OFDMA Throughput Parameters
+Users = 1:5;
+RB = [10 12 8 15 5];
+RB_BW = 180e3;                  % 180 kHz
+ModEff = [2 4 6 4 2];
+Throughput = (RB .* RB_BW .* ModEff)/1e6;   % Mbps
+
+% MIMO Simulation
+for i = 1:length(SNR)
+
+    bits = randi([0 1],5000,1);
+    symbols = 2*bits-1;         % BPSK
+
+    H = (randn(Nr,Nt)+1j*randn(Nr,Nt))/sqrt(2);
+    noise = (randn(1,length(bits))+1j*randn(1,length(bits)))/sqrt(2*SNR(i));
+
+    rx = real(H(1,1)*symbols' + noise) > 0;
+
+    BER(i) = mean(rx'~=bits);
+    Reliability(i) = 1 - BER(i);
+
+end
+
+% Results
+disp(table(Users',RB',Throughput',...
+    'VariableNames',{'User','ResourceBlocks','Throughput_Mbps'}));
+
+% Plots
+figure;
+
+subplot(2,2,1)
+semilogy(SNR_dB,BER,'-o','LineWidth',2);
+title('BER vs SNR');
+xlabel('SNR (dB)');
+ylabel('BER');
+grid on;
+
+subplot(2,2,2)
+plot(SNR_dB,Reliability,'-s','LineWidth',2);
+title('Reliability vs SNR');
+xlabel('SNR (dB)');
+ylabel('Reliability');
+grid on;
+
+subplot(2,2,3)
+plot(Users,Throughput,'-o','LineWidth',2);
+title('User Throughput');
+xlabel('Users');
+ylabel('Throughput (Mbps)');
+grid on;
+
+subplot(2,2,4)
+plot(RB,Throughput,'-d','LineWidth',2);
+title('Resource Blocks vs Throughput');
+xlabel('Resource Blocks');
+ylabel('Throughput (Mbps)');
+grid on;
