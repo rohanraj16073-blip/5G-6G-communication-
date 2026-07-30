@@ -1,0 +1,49 @@
+clc; clear; close all;
+
+% System Parameters
+BW = 10e6;                 % Total Bandwidth (10 MHz)
+RB_BW = 180e3;             % Bandwidth per Resource Block
+TotalRB = floor(BW/RB_BW); % Total Resource Blocks
+
+Users = 1:5;
+RB = [12 10 9 8 11];       % Resource Blocks allocated
+ModEff = [2 4 6 4 2];      % QPSK,16QAM,64QAM...
+
+% Calculations
+Utilization = (RB/TotalRB)*100;
+Throughput = (RB .* RB_BW .* ModEff)/1e6;   % Mbps
+
+% Display Results
+disp(table(Users',RB',Utilization',Throughput',...
+    'VariableNames',{'User','ResourceBlocks','Utilization_%','Throughput_Mbps'}));
+
+% Plots
+figure;
+
+subplot(2,2,1)
+stem(Users,RB,'filled');
+title('Resource Block Allocation');
+xlabel('Users');
+ylabel('RBs');
+grid on;
+
+subplot(2,2,2)
+plot(Users,Utilization,'-o','LineWidth',2);
+title('RB Utilization');
+xlabel('Users');
+ylabel('Utilization (%)');
+grid on;
+
+subplot(2,2,3)
+plot(Users,Throughput,'-s','LineWidth',2);
+title('User Throughput');
+xlabel('Users');
+ylabel('Mbps');
+grid on;
+
+subplot(2,2,4)
+plot(RB,Throughput,'-d','LineWidth',2);
+title('RB vs Throughput');
+xlabel('Resource Blocks');
+ylabel('Throughput (Mbps)');
+grid on;
