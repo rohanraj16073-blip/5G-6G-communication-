@@ -1,0 +1,52 @@
+clc; clear; close all;
+
+% Parameters
+FrameTime = 4.615;      % ms
+TotalSlots = 8;
+AllocatedSlots = 5;
+Users = 1:TotalSlots;
+
+% Calculations
+SlotTime = FrameTime/TotalSlots;
+t = 0:SlotTime:FrameTime;
+Allocation = [ones(1,AllocatedSlots) zeros(1,TotalSlots-AllocatedSlots)];
+Blocked = 1 - Allocation;
+Utilization = (AllocatedSlots/TotalSlots)*100;
+
+% Display Results
+disp(table(Users',Allocation',...
+    'VariableNames',{'User','Allocated(1=Yes,0=No)'}));
+fprintf('Frame Utilization = %.2f %%\n',Utilization);
+
+% Plots
+figure;
+
+subplot(2,2,1)
+stem(t,ones(size(t)),'filled');
+title('TDMA Time Slots');
+xlabel('Time (ms)');
+ylabel('Slots');
+grid on;
+
+subplot(2,2,2)
+plot([1 2],[AllocatedSlots TotalSlots-AllocatedSlots],'-o','LineWidth',2);
+title('Allocated vs Free Slots');
+xlabel('1 = Allocated   2 = Free');
+ylabel('Number of Slots');
+grid on;
+
+subplot(2,2,3)
+stem(Users,Allocation,'filled');
+title('User Slot Allocation');
+xlabel('Users');
+ylabel('Allocated');
+ylim([-0.2 1.2]);
+grid on;
+
+subplot(2,2,4)
+plot(Users,Allocation,'-o',Users,Blocked,'-s','LineWidth',2);
+title('Allocated vs Blocked Users');
+xlabel('Users');
+ylabel('Status');
+legend('Allocated','Blocked');
+grid on;
