@@ -1,0 +1,41 @@
+clc; clear; close all;
+
+% Basic Parameters
+fs = 1000; t = 0:1/fs:1;
+Users = 3; TBW = 600; BW = 200;
+fc = [100 300 500];
+SignalPower = 1; NoisePower = [0.1 0.05 0.01];
+
+% Calculations
+ChannelBW = TBW/Users;
+DataRate = BW * log2(2);      % BPSK
+SNR = 10*log10(SignalPower./NoisePower);
+
+% Generate FDMA Signals
+msg = sin(2*pi*10*t);
+for i = 1:Users
+    signal(i,:) = msg .* cos(2*pi*fc(i)*t);
+end
+
+% Display Results
+disp(table((1:Users)',ChannelBW*ones(Users,1),DataRate*ones(Users,1),NoisePower',SNR',...
+    'VariableNames',{'User','ChannelBW_kHz','DataRate_kbps','NoisePower_W','SNR_dB'}));
+
+% Plots
+figure;
+
+subplot(2,2,1)
+plot(t,signal(1,:),t,signal(2,:),t,signal(3,:));
+title('FDMA Signals'); xlabel('Time'); ylabel('Amplitude'); grid on;
+
+subplot(2,2,2)
+bar(ChannelBW*ones(1,Users));
+title('Bandwidth per User'); xlabel('Users'); ylabel('kHz'); grid on;
+
+subplot(2,2,3)
+bar(DataRate*ones(1,Users));
+title('Data Rate'); xlabel('Users'); ylabel('kbps'); grid on;
+
+subplot(2,2,4)
+bar(SNR);
+title('SNR'); xlabel('Users'); ylabel('dB'); grid on;
