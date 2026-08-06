@@ -1,0 +1,103 @@
+clc;
+clear;
+close all;
+
+%% LTE-M Wearable Monitoring System
+
+% Simulation Parameters
+N = 10000;                 % Number of transmitted bits
+SNR_dB = 0:2:20;           % SNR Range
+BER = zeros(length(SNR_dB),1);
+PDR = zeros(length(SNR_dB),1);
+Reliability = zeros(length(SNR_dB),1);
+
+%% Wearable Sensor Data
+HeartRate = randi([60 100],100,1);          % bpm
+Temperature = 36 + rand(100,1)*2;           % Celsius
+
+disp('Sample Heart Rate Data');
+disp(HeartRate(1:10));
+
+disp('Sample Temperature Data');
+disp(Temperature(1:10));
+
+%% Convert Sensor Data to Binary
+sensorData = [HeartRate; round(Temperature*10)];
+binaryData = de2bi(sensorData,8,'left-msb');
+txBits = binaryData(:);
+
+%% Simulation over Different SNR Values
+
+for k = 1:length(SNR_dB)
+
+    snr = SNR_dB(k);
+
+    %% BPSK Modulation
+    txSignal = 2*txBits - 1;
+
+    %% AWGN Channel
+    rxSignal = awgn(txSignal,snr,'measured');
+
+    %% Receiver
+    rxBits = rxSignal > 0;
+
+    %% BER
+    [numErr, ber] = biterr(txBits,rxBits);
+    BER(k) = ber;
+
+    %% Packet Delivery Ratio
+    packetSize = 64;
+    packets = floor(length(txBits)/packetSize);
+
+    success = 0;
+
+    for p = 1:packets
+
+        startIndex = (p-1)*packetSize + 1;
+        endIndex = p*packetSize;
+
+        if isequal(txBits(startIndex:endIndex),rxBits(startIndex:endIndex))
+            success = success + 1;
+        end
+
+    end
+
+    PDR(k) = success/packets;
+
+    %% Reliability
+    Reliability(k) = (1-BER(k))*100;
+
+end
+
+%% Results
+
+figure;
+
+plot(SNR_dB,BER,'-o','LineWidth',2);
+grid on;
+xlabel('SNR (dB)');
+ylabel('Bit Error Rate');
+title('BER Performance of LTE-M');
+
+figure;
+
+plot(SNR_dB,PDR,'-s','LineWidth',2);
+grid on;
+xlabel('SNR (dB)');
+ylabel('Packet Delivery Ratio');
+title('Packet Delivery Ratio');
+
+figure;
+
+plot(SNR_dB,Reliability,'-d','LineWidth',2);
+grid on;
+xlabel('SNR (dB)');
+ylabel('Reliability (%)');
+title('Communication Reliability');
+
+%% Display Table
+
+Results = table(SNR_dB',BER,PDR,Reliability,...
+    'VariableNames',{'SNR_dB','BER','PDR','Reliability'});
+
+disp(Results);
