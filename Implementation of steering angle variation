@@ -1,0 +1,42 @@
+clc; clear; close all;
+
+% Beamforming Parameters
+Angle = [-60 -30 0 30 60];          % Steering Angles (degrees)
+Gain = [9 12 15 12 9];              % Array Gain (dB)
+
+% Desired vs Actual Beam Direction
+Desired = Angle;
+Actual = [-58 -32 1 29 62];
+Error = abs(Desired - Actual);
+
+% Display Results
+disp(table(Desired',Actual',Error',...
+    'VariableNames',{'Desired_Angle','Actual_Angle','Error_Deg'}));
+
+% Plots
+figure;
+
+subplot(2,2,1)
+polarplot(deg2rad(Angle),ones(size(Angle)),'o-','LineWidth',2);
+title('Beam Steering Direction');
+
+subplot(2,2,2)
+bar(Angle,Gain);
+title('Array Gain vs Steering Angle');
+xlabel('Steering Angle (Degrees)');
+ylabel('Array Gain (dB)');
+grid on;
+
+subplot(2,2,3)
+plot(Desired,Error,'-o','LineWidth',2);
+title('Beam Direction Error');
+xlabel('Desired Angle (Degrees)');
+ylabel('Error (Degrees)');
+grid on;
+
+subplot(2,2,4)
+plot(Angle,Gain,'-s','LineWidth',2);
+title('Steering Angle vs Gain');
+xlabel('Steering Angle (Degrees)');
+ylabel('Gain (dB)');
+grid on;
