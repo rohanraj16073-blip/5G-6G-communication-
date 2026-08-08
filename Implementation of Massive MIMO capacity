@@ -1,0 +1,48 @@
+clc; clear; close all;
+
+% Channel Capacity Parameters
+SNR_dB = 0:5:30;
+SNR = 10.^(SNR_dB/10);
+Capacity = log2(1 + SNR);      % Shannon Capacity (bps/Hz)
+
+% Antenna Parameters
+Antennas = [4 8 16 32 64];
+Gain = 10*log10(Antennas);     % Antenna Gain (dB)
+
+% Display Results
+disp(table(SNR_dB',Capacity',...
+    'VariableNames',{'SNR_dB','Capacity_bpsHz'}));
+
+disp(table(Antennas',Gain',...
+    'VariableNames',{'Antennas','Gain_dB'}));
+
+% Plots
+figure;
+
+subplot(2,2,1)
+plot(SNR_dB,Capacity,'-o','LineWidth',2);
+title('Channel Capacity vs SNR');
+xlabel('SNR (dB)');
+ylabel('Capacity (bps/Hz)');
+grid on;
+
+subplot(2,2,2)
+bar(Antennas,Gain);
+title('Antenna Gain');
+xlabel('Number of Antennas');
+ylabel('Gain (dB)');
+grid on;
+
+subplot(2,2,3)
+plot(Antennas,Gain,'-s','LineWidth',2);
+title('Antennas vs Gain');
+xlabel('Number of Antennas');
+ylabel('Gain (dB)');
+grid on;
+
+subplot(2,2,4)
+plot(SNR_dB,Capacity,'-*','LineWidth',2);
+title('Capacity Growth with SNR');
+xlabel('SNR (dB)');
+ylabel('Capacity (bps/Hz)');
+grid on;
