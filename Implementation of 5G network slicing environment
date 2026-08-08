@@ -1,0 +1,53 @@
+clc; clear; close all;
+
+% Network Slice Types
+Slices = {'eMBB','URLLC','mMTC','Private','IoT'};
+
+% Parameters
+Count = ones(1,5);                  % One slice of each type
+Utilization = [85 70 60 75 50];     % Utilization (%)
+Latency = [25 5 40 15 60];          % End-to-End Latency (ms)
+
+% Display Results
+disp(table(Slices',Count',Utilization',Latency',...
+    'VariableNames',{'SliceType','Count','Utilization_%','Latency_ms'}));
+
+% Plots
+figure;
+
+% Plot 1 - Number of Slices
+subplot(2,2,1)
+bar(Count);
+set(gca,'XTick',1:5,'XTickLabel',Slices);
+title('Configured Network Slices');
+xlabel('Network Slice Type');
+ylabel('Number of Slices');
+grid on;
+
+% Plot 2 - Slice Utilization
+subplot(2,2,2)
+bar(Utilization);
+set(gca,'XTick',1:5,'XTickLabel',Slices);
+title('Slice Utilization');
+xlabel('Network Slice Type');
+ylabel('Utilization (%)');
+ylim([0 100]);
+grid on;
+
+% Plot 3 - End-to-End Latency
+subplot(2,2,3)
+plot(1:5,Latency,'-o','LineWidth',2);
+set(gca,'XTick',1:5,'XTickLabel',Slices);
+title('End-to-End Latency');
+xlabel('Network Slice Type');
+ylabel('Latency (ms)');
+ylim([0 70]);
+grid on;
+
+% Plot 4 - Utilization vs Latency
+subplot(2,2,4)
+plot(Utilization,Latency,'-s','LineWidth',2);
+title('Utilization vs Latency');
+xlabel('Utilization (%)');
+ylabel('Latency (ms)');
+grid on;
